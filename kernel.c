@@ -366,14 +366,16 @@ void serial_readwrite_task()
     len_msghead = strlen("MyShell:");
 
 	while (1) {
+        
         curr_char =0;
-        memset(str, 0x00, sizeof(str));
+        memset(str, 0x00, strlen(str));
         
         memcpy(str, "MyShell:", len_msghead);
 		curr_char = strlen(str);
         
 		done = 0;
 		do {
+
 			/* Receive a byte from the RS232 port (this call will
 			 * block). */
 			read(fdin, &ch, 1);
@@ -383,11 +385,12 @@ void serial_readwrite_task()
 				write_char('\n');
 				write_char('\r');
 			}            
+            
 
 			/* If the byte is an end-of-line type character, then
 			 * finish the string and inidcate we are done.
 			 */
-			if (curr_char >= 98 || (ch == '\r') || (ch == '\n')) {
+			if (curr_char >= 99 || (ch == '\r') || (ch == '\n')) {
 				str[curr_char] = '\0';
 				done = -1;
 				/* Otherwise, add the character to the
@@ -396,15 +399,18 @@ void serial_readwrite_task()
 			else {
 				str[curr_char++] = ch;
 			}
+            
 		} while (!done);
 
 		/* Once we are done building the response string, queue the
 		 * response to be sent to the RS232 port.
 		 */
 		 
-//		write(fdout, str, curr_char+1+1);		 
-        write(fdout, str, strlen(str));
-
+		write(fdout, str, curr_char+1+1);		 
+//        write(fdout, str, strlen(str));      
+    
+	}
+/*
         for(i=0; i<3; i++) 		
             
     		if(! strcmp(str+len_msghead, strCmd[i])) {
@@ -430,9 +436,9 @@ void serial_readwrite_task()
                 
     		}//for
 
-        
-    
-	}
+*/
+
+
     
 }
 
