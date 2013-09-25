@@ -346,83 +346,8 @@ void write_char(char data_char)
 	while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);	
 }
 
-void serial_readwrite_task()
+void serial_parse_job(const char * str)
 {
-	int fdout, fdin;
-	char str[100];
-	char ch;
-	int curr_char;
-	int done;
-    
-    char *strCmd[] = {"hello","echo","ps",NULL};
-    int i;
-    int len_msghead;
-    
-
-	fdout = mq_open("/tmp/mqueue/out", 0);
-	fdin = open("/dev/tty0/in", 0);
-
-	/* Prepare the response message to be queued. */
-    len_msghead = strlen("MyShell:");
-
-	while (1) {
-<<<<<<< HEAD
-        
-        curr_char =0;
-        memset(str, 0x00, strlen(str));
-=======
-        curr_char =0;
-        memset(str, 0x00, sizeof(str));
->>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
-        
-        memcpy(str, "MyShell:", len_msghead);
-		curr_char = strlen(str);
-        
-		done = 0;
-		do {
-
-			/* Receive a byte from the RS232 port (this call will
-			 * block). */
-			read(fdin, &ch, 1);
-            
-			if(ch == '\r') {
-				/* Enter */
-				write_char('\n');
-				write_char('\r');
-			}            
-<<<<<<< HEAD
-            
-=======
->>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
-
-			/* If the byte is an end-of-line type character, then
-			 * finish the string and inidcate we are done.
-			 */
-<<<<<<< HEAD
-			if (curr_char >= 99 || (ch == '\r') || (ch == '\n')) {
-=======
-			if (curr_char >= 98 || (ch == '\r') || (ch == '\n')) {
->>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
-				str[curr_char] = '\0';
-				done = -1;
-				/* Otherwise, add the character to the
-				 * response string. */
-			}
-			else {
-				str[curr_char++] = ch;
-			}
-            
-		} while (!done);
-
-		/* Once we are done building the response string, queue the
-		 * response to be sent to the RS232 port.
-		 */
-		 
-<<<<<<< HEAD
-		write(fdout, str, curr_char+1+1);		 
-//        write(fdout, str, strlen(str));      
-    
-	}
 /*
         for(i=0; i<3; i++) 		
             
@@ -449,42 +374,75 @@ void serial_readwrite_task()
                 
     		}//for
 
-*/
+*/}
 
+void serial_readwrite_task()
+{
+	int fdout, fdin;
+	char str[100];
+	char ch;
+	int curr_char;
+	int done;
+    
+    char *strCmd[] = {"hello","echo","ps",NULL};
+    int i;
+    int len_msghead;
+    
 
-=======
-//		write(fdout, str, curr_char+1+1);		 
-        write(fdout, str, strlen(str));
+	fdout = mq_open("/tmp/mqueue/out", 0);
+	fdin = open("/dev/tty0/in", 0);
 
-        for(i=0; i<3; i++) 		
-            
-    		if(! strcmp(str+len_msghead, strCmd[i])) {
+	/* Prepare the response message to be queued. */
+    len_msghead = strlen("MyShell:");
 
-                memset(str, 0x00, sizeof(str));
-
-                switch(i) {
-
-                    case 0:
-                        strncpy(str, "\n\r__A\n", strlen("\n\r__A\n"));
-                        break;
-                    case 1:
-                        strncpy(str, "\n\r__B\n", strlen("\n\r__B\n"));
-                        break;
-                    case 2:
-                        strncpy(str, "\n\r__C\n", strlen("\n\r__C\n"));
-                        break;
-                            
-
-                }//switch
-
-        		write(fdout, str, strlen(str));
-                
-    		}//for
-
+	while (1) {
         
+        curr_char =0;
+        memset(str, 0x00, strlen(str));
+        
+        memcpy(str, "MyShell:", len_msghead);
+		curr_char = strlen(str);
+        
+		done = 0;
+		do {
+
+			/* Receive a byte from the RS232 port (this call will
+			 * block). */
+			read(fdin, &ch, 1);
+            
+			if(ch == '\r') {
+				/* Enter */
+				write_char('\n');
+				write_char('\r');
+			}            
+            
+
+			/* If the byte is an end-of-line type character, then
+			 * finish the string and inidcate we are done.
+			 */
+			if (curr_char >= 99 || (ch == '\r') || (ch == '\n')) {
+				str[curr_char] = '\0';
+				done = -1;
+				/* Otherwise, add the character to the
+				 * response string. */
+			}
+			else {
+				str[curr_char++] = ch;
+			}
+            
+		} while (!done);
+
+		/* Once we are done building the response string, queue the
+		 * response to be sent to the RS232 port.
+		 */
+		 
+		write(fdout, str, curr_char+1+1);		 
     
 	}
->>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
+
+
+//    serial_parse_job(str);
+
     
 }
 
