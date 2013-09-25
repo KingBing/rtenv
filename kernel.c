@@ -366,9 +366,14 @@ void serial_readwrite_task()
     len_msghead = strlen("MyShell:");
 
 	while (1) {
+<<<<<<< HEAD
         
         curr_char =0;
         memset(str, 0x00, strlen(str));
+=======
+        curr_char =0;
+        memset(str, 0x00, sizeof(str));
+>>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
         
         memcpy(str, "MyShell:", len_msghead);
 		curr_char = strlen(str);
@@ -385,12 +390,19 @@ void serial_readwrite_task()
 				write_char('\n');
 				write_char('\r');
 			}            
+<<<<<<< HEAD
             
+=======
+>>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
 
 			/* If the byte is an end-of-line type character, then
 			 * finish the string and inidcate we are done.
 			 */
+<<<<<<< HEAD
 			if (curr_char >= 99 || (ch == '\r') || (ch == '\n')) {
+=======
+			if (curr_char >= 98 || (ch == '\r') || (ch == '\n')) {
+>>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
 				str[curr_char] = '\0';
 				done = -1;
 				/* Otherwise, add the character to the
@@ -406,6 +418,7 @@ void serial_readwrite_task()
 		 * response to be sent to the RS232 port.
 		 */
 		 
+<<<<<<< HEAD
 		write(fdout, str, curr_char+1+1);		 
 //        write(fdout, str, strlen(str));      
     
@@ -439,6 +452,39 @@ void serial_readwrite_task()
 */
 
 
+=======
+//		write(fdout, str, curr_char+1+1);		 
+        write(fdout, str, strlen(str));
+
+        for(i=0; i<3; i++) 		
+            
+    		if(! strcmp(str+len_msghead, strCmd[i])) {
+
+                memset(str, 0x00, sizeof(str));
+
+                switch(i) {
+
+                    case 0:
+                        strncpy(str, "\n\r__A\n", strlen("\n\r__A\n"));
+                        break;
+                    case 1:
+                        strncpy(str, "\n\r__B\n", strlen("\n\r__B\n"));
+                        break;
+                    case 2:
+                        strncpy(str, "\n\r__C\n", strlen("\n\r__C\n"));
+                        break;
+                            
+
+                }//switch
+
+        		write(fdout, str, strlen(str));
+                
+    		}//for
+
+        
+    
+	}
+>>>>>>> bef7cb9edb9e66eade64c7290d5f8418707b5b95
     
 }
 
