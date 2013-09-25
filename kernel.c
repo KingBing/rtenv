@@ -346,35 +346,27 @@ void write_char(char data_char)
 	while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);	
 }
 
-void serial_parse_job(const char * str)
+void debug_str(char* str)
 {
-/*
-        for(i=0; i<3; i++) 		
-            
-    		if(! strcmp(str+len_msghead, strCmd[i])) {
+	int fdout = mq_open("/tmp/mqueue/out", 0);
+	char cmd[100];
+    
+    memset(cmd, 0x00, sizeof(cmd));
 
-                memset(str, 0x00, sizeof(str));
+    cmd[0] = '\n';
+    cmd[1] = '\r';
+    cmd[2] = '\t';
 
-                switch(i) {
+    if(strlen(str)<100) {
+        strncpy(cmd+3, str, strlen(str));
+        cmd[strlen(cmd)+1] = '\n';
+        cmd[strlen(cmd)+2] = '\0';
+    }
+    else
+        strncpy(cmd+3, "Errir! Length to much.\n\0", sizeof(cmd));
 
-                    case 0:
-                        strncpy(str, "\n\r__A\n", strlen("\n\r__A\n"));
-                        break;
-                    case 1:
-                        strncpy(str, "\n\r__B\n", strlen("\n\r__B\n"));
-                        break;
-                    case 2:
-                        strncpy(str, "\n\r__C\n", strlen("\n\r__C\n"));
-                        break;
-                            
-
-                }//switch
-
-        		write(fdout, str, strlen(str));
-                
-    		}//for
-
-*/}
+	write(fdout, cmd, strlen(cmd));		 
+}
 
 void serial_readwrite_task()
 {
@@ -397,8 +389,8 @@ void serial_readwrite_task()
 
 	while (1) {
         
-        curr_char =0;
-        memset(str, 0x00, strlen(str));
+        curr_char = 0;
+        memset(str, 0x00, sizeof(str));
         
         memcpy(str, "MyShell:", len_msghead);
 		curr_char = strlen(str);
@@ -428,21 +420,48 @@ void serial_readwrite_task()
 			}
 			else {
 				str[curr_char++] = ch;
-			}
-            
+			}    
 		} while (!done);
 
 		/* Once we are done building the response string, queue the
 		 * response to be sent to the RS232 port.
-		 */
-		 
-		write(fdout, str, curr_char+1+1);		 
+		 */		 
+		write(fdout, str, curr_char+1);	
+
+//	}//while
+
+        debug_str("Dbg_01");
+        debug_str(str);
+        debug_str(str+len_msghead);
+
+        for(i=0; i<3; i++)
+    	if(! strcmp(str+len_msghead, strCmd[i])) {
+
+            memset(str, 0x00, sizeof(str));
+
+            switch(i) {
+
+                case 0: //cmd : Hello
+                    strncpy(str, "\n\rHello, World!!\n\0", strlen("\n\rHello, World!!\n\0"));
+                    break;
+                case 1: //cmd : echo
+                    strncpy(str, "\n\r__B\n\0", strlen("\n\r__B\n\0"));
+                    break;
+                case 2: //cmd: ps
+                    strncpy(str, "\n\r__C\n\0", strlen("\n\r__C\n\0"));
+                    break;
+                        
+
+            }//switch
+
+    		write(fdout, str, strlen(str));
+            
+    	}//for
+
+
     
-	}
-
-
-//    serial_parse_job(str);
-
+    
+	}//while
     
 }
 
